@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_activity_title">Masuk</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Kata Sandi</string>
+    <string name="don_t_have_account">Belum punya akun?</string>
+    <string name="sign_up">Daftar</string>
+    <string name="name_hint">Nama</string>
+    <string name="already_sign_up">Sudah mendaftar?</string>
+    <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Beranda</string>
+    <string name="title_notifications">Notifikasi</string>
+    <string name="logout">Keluar</string>
+    <string name="dark_mode">Mode gelap</string>
+    <string name="camera">Kamera</string>
+    <string name="gallery">Galeri</string>
+    <string name="description">Deskripsi</string>
+    <string name="upload">Unggah</string>
+    <string name="app_name">AplikasiStory</string>
+    <string name="app_icon">IconAplikasi</string>
+    <string name="settings">Pengaturan</string>
+    <string name="add_stories_activity_title">Postingan baru</string>
+    <string name="stories_detail_activity_title">Detail story</string>
+</resources>
