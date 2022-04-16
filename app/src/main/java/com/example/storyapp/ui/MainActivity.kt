@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun showRecycleList(storiesList: ArrayList<ListStoryItem>) {
+    private fun showRecycleList(storiesList: List<ListStoryItem>) {
         binding.rvStory.setHasFixedSize(true)
         binding.rvStory.layoutManager = LinearLayoutManager(this)
         val listUserAdapter = StoriesListAdapter(storiesList)

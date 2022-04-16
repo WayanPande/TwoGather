@@ -20,8 +20,8 @@ class StoriesViewModel : ViewModel() {
     private val _isError = MutableLiveData<Boolean>()
     val isError: LiveData<Boolean> = _isError
 
-    private val _storyList = MutableLiveData<ArrayList<ListStoryItem>>()
-    val storyList: LiveData<ArrayList<ListStoryItem>> = _storyList
+    private val _storyList = MutableLiveData<List<ListStoryItem>>()
+    val storyList: LiveData<List<ListStoryItem>> = _storyList
 
 
     fun getStoriesList(token: String) {
@@ -35,7 +35,7 @@ class StoriesViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        setStoryList(responseBody.listStory as List<ListStoryItem>)
+                        _storyList.value = (responseBody.listStory as List<ListStoryItem>?)
                     }
                 } else {
                     _isError.value = true
@@ -49,14 +49,4 @@ class StoriesViewModel : ViewModel() {
             }
         })
     }
-
-    private fun setStoryList(data: List<ListStoryItem>) {
-        val storyList = ArrayList<ListStoryItem>()
-        for (story in data) {
-            storyList.add(story)
-        }
-
-        _storyList.value = storyList
-    }
-
 }

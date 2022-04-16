@@ -1,5 +1,6 @@
 package com.example.storyapp.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.view.LayoutInflater
@@ -9,13 +10,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.storyapp.R
 import com.example.storyapp.data.remote.response.ListStoryItem
 
-class StoriesListAdapter(private val storiesList: ArrayList<ListStoryItem>) :
-    RecyclerView.Adapter<StoriesListAdapter.ListViewHolder>() {
+class StoriesListAdapter(private val storiesList: List<ListStoryItem>) :
+   ListAdapter<ListStoryItem, StoriesListAdapter.ListViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         val view: View =
@@ -71,4 +74,17 @@ class StoriesListAdapter(private val storiesList: ArrayList<ListStoryItem>) :
     override fun getItemCount(): Int = storiesList.size
 
 
+    companion object {
+        val DIFF_CALLBACK: DiffUtil.ItemCallback<ListStoryItem> =
+            object : DiffUtil.ItemCallback<ListStoryItem>() {
+                override fun areItemsTheSame(oldUser: ListStoryItem, newUser: ListStoryItem): Boolean {
+                    return oldUser.id == newUser.id
+                }
+
+                @SuppressLint("DiffUtilEquals")
+                override fun areContentsTheSame(oldUser: ListStoryItem, newUser: ListStoryItem): Boolean {
+                    return oldUser == newUser
+                }
+            }
+    }
 }

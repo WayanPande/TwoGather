@@ -7,10 +7,6 @@
     <string name="sign_up">Daftar</string>
     <string name="name_hint">Nama</string>
     <string name="already_sign_up">Sudah mendaftar?</string>
-    <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Beranda</string>
-    <string name="title_notifications">Notifikasi</string>
     <string name="logout">Keluar</string>
     <string name="dark_mode">Mode gelap</string>
     <string name="camera">Kamera</string>
