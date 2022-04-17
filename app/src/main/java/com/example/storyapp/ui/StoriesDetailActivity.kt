@@ -74,7 +74,7 @@ class StoriesDetailActivity : AppCompatActivity() {
             .into(binding.ivProfile)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.option_menu, menu)
 

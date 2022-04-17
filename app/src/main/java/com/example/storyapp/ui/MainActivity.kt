@@ -8,24 +8,34 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.storyapp.R
-import com.example.storyapp.data.remote.response.ListStoryItem
+import com.example.storyapp.adapter.LoadingStateAdapter
+import com.example.storyapp.adapter.StoriesListAdapter
 import com.example.storyapp.databinding.ActivityMainBinding
 import com.example.storyapp.util.LoadingDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val loadingDialog = LoadingDialog(this)
+    private val storiesViewModel: StoriesViewModel by viewModels {
+        ViewModelFactory(this)
+    }
+    private var adapter: StoriesListAdapter? = null
+    private var token: String = ""
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token")
 
@@ -38,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         val pref = LoginPreferences.getInstance(dataStore)
         val loginViewModel =
             ViewModelProvider(this, LoginViewModelFactory(pref))[LoginViewModel::class.java]
-        val storiesViewModel = ViewModelProvider(this)[StoriesViewModel::class.java]
+
 
         loginViewModel.getUserLoginData().observe(this) { token: String ->
 
@@ -48,19 +58,11 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
 
-            storiesViewModel.getStoriesList(token)
-
+            this.token = token
+            initView()
+            showRecycleList()
         }
 
-        storiesViewModel.storyList.observe(this) {
-
-            if (it.size > 1) {
-                showRecycleList(it)
-            } else {
-                Toast.makeText(this, "No data available...", Toast.LENGTH_LONG).show()
-            }
-
-        }
 
         storiesViewModel.isLoading.observe(this) {
             showLoading(it)
@@ -94,10 +96,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.option_menu, menu)
 
@@ -129,12 +130,24 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-
-    private fun showRecycleList(storiesList: List<ListStoryItem>) {
+    private fun initView() {
         binding.rvStory.setHasFixedSize(true)
         binding.rvStory.layoutManager = LinearLayoutManager(this)
-        val listUserAdapter = StoriesListAdapter(storiesList)
-        binding.rvStory.adapter = listUserAdapter
+        adapter = StoriesListAdapter()
+        binding.rvStory.adapter = adapter!!.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                adapter!!.retry()
+            }
+        )
+    }
+
+
+    private fun showRecycleList() {
+        lifecycleScope.launch {
+            storiesViewModel.getStoriesList(token).collectLatest { item ->
+                adapter?.submitData(item)
+            }
+        }
     }
 
 

@@ -1,38 +1,39 @@
-package com.example.storyapp.ui
+package com.example.storyapp.adapter
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.storyapp.R
 import com.example.storyapp.data.remote.response.ListStoryItem
+import com.example.storyapp.databinding.ItemRowStoryBinding
+import com.example.storyapp.ui.MainActivity
+import com.example.storyapp.ui.StoriesDetailActivity
 
-class StoriesListAdapter(private val storiesList: List<ListStoryItem>) :
-   ListAdapter<ListStoryItem, StoriesListAdapter.ListViewHolder>(DIFF_CALLBACK) {
+class StoriesListAdapter :
+    PagingDataAdapter<ListStoryItem, StoriesListAdapter.ListViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
-        val view: View =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_row_story, parent, false)
-        return ListViewHolder(view)
+
+        val binding =
+            ItemRowStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ListViewHolder(binding)
     }
 
-    class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ListViewHolder(binding: ItemRowStoryBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        private val ivStory: ImageView = itemView.findViewById(R.id.iv_story)
-        private val ivProfile: ImageView = itemView.findViewById(R.id.iv_profile)
-        private val tvName: TextView = itemView.findViewById(R.id.tv_name)
-        private val tvFavorite: TextView = itemView.findViewById(R.id.tv_favorite)
-        private val tvComment: TextView = itemView.findViewById(R.id.tv_comment)
+        private val ivStory: ImageView = binding.ivStory
+        private val ivProfile: ImageView = binding.ivProfile
+        private val tvName: TextView = binding.tvName
+        private val tvFavorite: TextView = binding.tvFavorite
+        private val tvComment: TextView = binding.tvComment
 
         fun bind(story: ListStoryItem) {
             Glide.with(itemView.context)
@@ -67,23 +68,28 @@ class StoriesListAdapter(private val storiesList: List<ListStoryItem>) :
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
 
-        holder.bind(storiesList[position])
+        val data = getItem(position)
+        if (data != null) {
+            holder.bind(data)
+        }
 
     }
 
-    override fun getItemCount(): Int = storiesList.size
-
-
     companion object {
-        val DIFF_CALLBACK: DiffUtil.ItemCallback<ListStoryItem> =
+        val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<ListStoryItem>() {
-                override fun areItemsTheSame(oldUser: ListStoryItem, newUser: ListStoryItem): Boolean {
-                    return oldUser.id == newUser.id
+                override fun areItemsTheSame(
+                    oldUser: ListStoryItem,
+                    newUser: ListStoryItem
+                ): Boolean {
+                    return oldUser == newUser
                 }
 
-                @SuppressLint("DiffUtilEquals")
-                override fun areContentsTheSame(oldUser: ListStoryItem, newUser: ListStoryItem): Boolean {
-                    return oldUser == newUser
+                override fun areContentsTheSame(
+                    oldUser: ListStoryItem,
+                    newUser: ListStoryItem
+                ): Boolean {
+                    return oldUser.id == newUser.id
                 }
             }
     }
