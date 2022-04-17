@@ -1,21 +1,15 @@
 package com.example.storyapp.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.*
-import androidx.paging.*
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.example.storyapp.data.remote.StoryRepository
 import com.example.storyapp.data.remote.response.ListStoryItem
-import com.example.storyapp.data.remote.response.StoryListResponse
-import com.example.storyapp.data.remote.retrofit.ApiConfig
-import com.example.storyapp.data.remote.retrofit.ApiService
 import com.example.storyapp.di.Injection
-import com.example.storyapp.paging.StoryPagingSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class StoriesViewModel(private val storyRepository: StoryRepository) : ViewModel() {
 

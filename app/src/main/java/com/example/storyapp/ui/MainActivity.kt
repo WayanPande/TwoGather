@@ -1,5 +1,6 @@
 package com.example.storyapp.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token")
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -96,6 +98,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+
+        binding.refreshLayout.setOnRefreshListener {
+            showRecycleList()
+            adapter?.notifyDataSetChanged()
+            binding.rvStory.scrollToPosition(0)
+            binding.refreshLayout.isRefreshing = false
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -131,7 +140,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        binding.rvStory.setHasFixedSize(true)
         binding.rvStory.layoutManager = LinearLayoutManager(this)
         adapter = StoriesListAdapter()
         binding.rvStory.adapter = adapter!!.withLoadStateFooter(
