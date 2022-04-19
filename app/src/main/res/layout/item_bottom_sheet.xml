@@ -17,6 +17,7 @@
         app:drawableStartCompat="@drawable/ic_logout" />
 
     <TextView
+        android:id="@+id/tv_maps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawablePadding="35dp"

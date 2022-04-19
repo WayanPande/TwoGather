@@ -12,6 +12,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.example.storyapp.R
 import com.example.storyapp.data.remote.response.ListStoryItem
 import com.example.storyapp.databinding.ItemRowStoryBinding
 import com.example.storyapp.ui.MainActivity
@@ -38,6 +40,7 @@ class StoriesListAdapter :
         fun bind(story: ListStoryItem) {
             Glide.with(itemView.context)
                 .load(story.photoUrl)
+                .apply(RequestOptions.placeholderOf(R.drawable.ic_image_loading).error(R.drawable.ic_error))
                 .into(ivStory)
 
             Glide.with(itemView.context)

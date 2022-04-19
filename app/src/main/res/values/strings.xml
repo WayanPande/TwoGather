@@ -21,4 +21,6 @@
     <string name="image_post">image_post</string>
     <string name="profile_pict">profile_pict</string>
     <string name="add_new_story">Add new story</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="add_location">Add Current Location</string>
 </resources>

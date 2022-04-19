@@ -19,4 +19,9 @@
     <string name="add_stories_activity_title">Postingan baru</string>
     <string name="stories_detail_activity_title">Detail story</string>
     <string name="retry">Coba lagi</string>
+    <string name="image_post">gambar_unggahan</string>
+    <string name="profile_pict">gambar_profile</string>
+    <string name="add_new_story">Tambah cerita baru</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="add_location">Tambah lokasi saat ini</string>
 </resources>

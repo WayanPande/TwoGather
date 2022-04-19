@@ -21,9 +21,9 @@ class UploadStoryViewModel : ViewModel() {
     val isError: LiveData<Boolean> = _isError
 
 
-    fun uploadStory(token: String, image: MultipartBody.Part, description: RequestBody) {
+    fun uploadStory(token: String, image: MultipartBody.Part, description: RequestBody, lat: Float? = null, lon: Float? = null) {
         _isLoading.value = true
-        val client = ApiConfig.getApiService().uploadStory("Bearer $token", image, description)
+        val client = ApiConfig.getApiService().uploadStory("Bearer $token", image, description, lat, lon)
         client.enqueue(object : Callback<StoryUploadResponse> {
             override fun onResponse(
                 call: Call<StoryUploadResponse>,

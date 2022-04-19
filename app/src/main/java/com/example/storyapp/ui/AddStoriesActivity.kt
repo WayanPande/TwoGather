@@ -6,11 +6,17 @@ import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -24,6 +30,8 @@ import com.example.storyapp.databinding.ActivityAddStoriesBinding
 import com.example.storyapp.util.LoadingDialog
 import com.example.storyapp.util.reduceFileImage
 import com.example.storyapp.util.uriToFile
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -36,6 +44,10 @@ class AddStoriesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddStoriesBinding
     private val loadingDialog = LoadingDialog(this)
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token")
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var lat: Float = 0F
+    private var lon: Float = 0f
+    private lateinit var dialog: AlertDialog
 
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
@@ -118,6 +130,67 @@ class AddStoriesActivity : AppCompatActivity() {
                 Toast.makeText(this, "Upload Berhasil!", Toast.LENGTH_SHORT).show()
             }
         }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        binding.cbLocation.setOnClickListener {
+            if (binding.cbLocation.isChecked) {
+                getMyLastLocation()
+            }
+        }
+
+    }
+
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+                else -> {
+                    // No location access granted.
+                }
+            }
+        }
+
+    private fun getMyLastLocation() {
+        if     (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ){
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    lat = location.latitude.toFloat()
+                    lon = location.longitude.toFloat()
+                } else {
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this, R.style.WrapContentDialog)
+                    val inflater: LayoutInflater = layoutInflater
+                    builder.setView(inflater.inflate(R.layout.no_location_permission_dialog, null))
+                    dialog = builder.create()
+                    dialog.show()
+                    binding.cbLocation.isChecked = false
+                }
+            }
+        } else {
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
 
@@ -189,10 +262,17 @@ class AddStoriesActivity : AppCompatActivity() {
                 ViewModelProvider(this, LoginViewModelFactory(pref))[LoginViewModel::class.java]
             val uploadStoryViewModel = ViewModelProvider(this)[UploadStoryViewModel::class.java]
 
-            loginViewModel.getUserLoginData().observe(this) { token: String ->
-                uploadStoryViewModel.uploadStory(token, imageMultipart, description)
-            }
+            if (binding.cbLocation.isChecked) {
+                loginViewModel.getUserLoginData().observe(this) { token: String ->
+                    uploadStoryViewModel.uploadStory(token, imageMultipart, description, lat, lon)
+                }
 
+            }else {
+                loginViewModel.getUserLoginData().observe(this) { token: String ->
+                    uploadStoryViewModel.uploadStory(token, imageMultipart, description)
+                }
+
+            }
 
         } else {
             Toast.makeText(

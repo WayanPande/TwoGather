@@ -134,6 +134,14 @@ class MainActivity : AppCompatActivity() {
                     loginViewModel.logoutUser()
                 }
 
+                val mapsBtn = dialog.findViewById<TextView>(R.id.tv_maps)
+
+                mapsBtn?.setOnClickListener {
+                    val intent = Intent(this, MapsActivity::class.java)
+                    intent.putExtra("TOKEN", token)
+                    startActivity(intent)
+                }
+
             }
         }
         return true

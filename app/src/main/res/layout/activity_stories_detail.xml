@@ -29,7 +29,8 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:transitionName="profilePict"
-                tools:src="@tools:sample/avatars" />
+                tools:src="@tools:sample/avatars"
+                android:contentDescription="@string/profile_pict" />
 
             <TextView
                 android:id="@+id/tv_name"
@@ -47,14 +48,15 @@
         <ImageView
             android:id="@+id/iv_story"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="450dp"
             android:transitionName="picture"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profile_wrapper"
-            tools:src="@drawable/login" />
+            tools:src="@drawable/login"
+            android:contentDescription="@string/image_post" />
 
 
         <TextView
