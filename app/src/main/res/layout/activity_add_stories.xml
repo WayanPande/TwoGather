@@ -80,7 +80,7 @@
 
         <CheckBox
             android:id="@+id/cb_location"
-            android:layout_marginVertical="20dp"
+            android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_location"
