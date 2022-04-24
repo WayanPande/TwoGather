@@ -10,6 +10,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.storyapp.data.remote.AuthenticationRepository
+import com.example.storyapp.data.remote.Result
 import com.example.storyapp.databinding.ActivitySignUpBinding
 import com.example.storyapp.util.LoadingDialog
 
@@ -17,6 +19,7 @@ class SignUpActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignUpBinding
     private val loadingDialog = LoadingDialog(this)
+    private lateinit var registerViewModel: RegisterViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +28,10 @@ class SignUpActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        val registerViewModel = ViewModelProvider(this)[RegisterViewModel::class.java]
+        val authenticationRepository = AuthenticationRepository()
+        val registerViewModelFactory = RegisterViewModelFactory(authenticationRepository)
+        registerViewModel =
+            ViewModelProvider(this, registerViewModelFactory)[RegisterViewModel::class.java]
 
         binding.signUpBtn.setOnClickListener {
             this.currentFocus?.let { view ->
@@ -45,22 +51,29 @@ class SignUpActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        registerViewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
+        registerViewModel.response.observe(this) { response ->
+            when (response) {
+                is Result.Success -> {
+                    showLoading(false)
+                    Toast.makeText(this@SignUpActivity, "Register Berhasil!", Toast.LENGTH_SHORT)
+                        .show()
 
-        registerViewModel.isError.observe(this) {
-            if (it) {
-                Toast.makeText(this@SignUpActivity, "Register gagal!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@SignUpActivity, "Register Berhasil!", Toast.LENGTH_SHORT).show()
-
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-                finish()
-
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this@SignUpActivity, "Register gagal!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is Result.Loading -> {
+                    showLoading(true)
+                }
             }
         }
+
+
 
         playAnimation()
     }

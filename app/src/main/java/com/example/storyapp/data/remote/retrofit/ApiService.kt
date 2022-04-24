@@ -20,11 +20,11 @@ interface ApiService {
 
     @POST("register")
     @FormUrlEncoded
-    fun registerRequest(
+   suspend fun registerRequest(
         @Field("name") name: String,
         @Field("email") email: String,
         @Field("password") password: String
-    ): Call<RegisterResponse>
+    ): Response<RegisterResponse>
 
     @GET("stories")
     suspend fun getStories(
@@ -36,7 +36,7 @@ interface ApiService {
     @GET("stories")
     fun getStoriesWithCoordinate(
         @Header("Authorization") token: String,
-        @Query("location") page: Int,
+        @Query("location") location: Int,
     ): Call<StoryListResponse>
 
     @Multipart
