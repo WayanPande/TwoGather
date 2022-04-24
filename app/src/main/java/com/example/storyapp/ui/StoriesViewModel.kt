@@ -6,7 +6,7 @@ import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.example.storyapp.data.remote.StoryRepository
+import com.example.storyapp.data.repository.StoryRepository
 import com.example.storyapp.data.remote.response.ListStoryItem
 import com.example.storyapp.data.remote.response.StoryListResponse
 import com.example.storyapp.data.remote.retrofit.ApiConfig

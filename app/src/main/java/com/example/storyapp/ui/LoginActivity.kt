@@ -13,6 +13,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
+import com.example.storyapp.data.repository.AuthenticationRepository
+import com.example.storyapp.data.remote.Result
 import com.example.storyapp.databinding.ActivityLoginBinding
 import com.example.storyapp.util.LoadingDialog
 
@@ -31,8 +33,12 @@ class LoginActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         val pref = LoginPreferences.getInstance(dataStore)
+        val authenticationRepository = AuthenticationRepository()
         val loginViewModel =
-            ViewModelProvider(this, LoginViewModelFactory(pref))[LoginViewModel::class.java]
+            ViewModelProvider(
+                this,
+                LoginViewModelFactory(pref, authenticationRepository)
+            )[LoginViewModel::class.java]
 
         binding.loginBtn.setOnClickListener {
 
@@ -52,24 +58,31 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        loginViewModel.response.observe(this) { response ->
+
+            when (response) {
+                is Result.Success -> {
+                    showLoading(false)
+                    Toast.makeText(this, "Login Berhasil!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this, "Login gagal!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is Result.Loading -> {
+                    showLoading(true)
+                }
+            }
+        }
+
 
         loginViewModel.getUserLoginData().observe(this) { token: String ->
             if (token != "") {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
-            }
-        }
-
-        loginViewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
-
-        loginViewModel.isError.observe(this) {
-            if (it) {
-                Toast.makeText(this@LoginActivity, "Login gagal!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@LoginActivity, "Login Berhasil!", Toast.LENGTH_SHORT).show()
             }
         }
 

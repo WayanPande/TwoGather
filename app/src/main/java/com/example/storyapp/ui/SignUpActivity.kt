@@ -10,7 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.storyapp.data.remote.AuthenticationRepository
+import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.data.remote.Result
 import com.example.storyapp.databinding.ActivitySignUpBinding
 import com.example.storyapp.util.LoadingDialog

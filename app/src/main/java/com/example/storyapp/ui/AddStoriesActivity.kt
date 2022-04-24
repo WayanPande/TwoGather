@@ -6,13 +6,10 @@ import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +23,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.R
+import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.databinding.ActivityAddStoriesBinding
 import com.example.storyapp.util.LoadingDialog
 import com.example.storyapp.util.reduceFileImage
@@ -258,8 +256,9 @@ class AddStoriesActivity : AppCompatActivity() {
             )
 
             val pref = LoginPreferences.getInstance(dataStore)
+            val authenticationRepository = AuthenticationRepository()
             val loginViewModel =
-                ViewModelProvider(this, LoginViewModelFactory(pref))[LoginViewModel::class.java]
+                ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
             val uploadStoryViewModel = ViewModelProvider(this)[UploadStoryViewModel::class.java]
 
             if (binding.cbLocation.isChecked) {

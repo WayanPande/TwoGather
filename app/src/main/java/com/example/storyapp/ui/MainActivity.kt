@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.storyapp.R
 import com.example.storyapp.adapter.LoadingStateAdapter
 import com.example.storyapp.adapter.StoriesListAdapter
+import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.databinding.ActivityMainBinding
 import com.example.storyapp.util.LoadingDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -48,8 +49,9 @@ class MainActivity : AppCompatActivity() {
 
 
         val pref = LoginPreferences.getInstance(dataStore)
+        val authenticationRepository = AuthenticationRepository()
         val loginViewModel =
-            ViewModelProvider(this, LoginViewModelFactory(pref))[LoginViewModel::class.java]
+            ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
 
 
         loginViewModel.getUserLoginData().observe(this) { token: String ->
@@ -120,8 +122,9 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_toggle -> {
 
                 val pref = LoginPreferences.getInstance(dataStore)
+                val authenticationRepository = AuthenticationRepository()
                 val loginViewModel =
-                    ViewModelProvider(this, LoginViewModelFactory(pref))[LoginViewModel::class.java]
+                    ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
 
                 val view: View = layoutInflater.inflate(R.layout.item_bottom_sheet, null)
                 val dialog = BottomSheetDialog(this)

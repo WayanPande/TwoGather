@@ -2,7 +2,7 @@ package com.example.storyapp.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.storyapp.data.remote.AuthenticationRepository
+import com.example.storyapp.data.repository.AuthenticationRepository
 
 class RegisterViewModelFactory(private val authenticationRepository: AuthenticationRepository) :
     ViewModelProvider.Factory {

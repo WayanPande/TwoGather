@@ -1,4 +1,4 @@
-package com.example.storyapp.data.remote
+package com.example.storyapp.data.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
