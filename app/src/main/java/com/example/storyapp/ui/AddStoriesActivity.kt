@@ -23,7 +23,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.R
+import com.example.storyapp.data.remote.Result
 import com.example.storyapp.data.repository.AuthenticationRepository
+import com.example.storyapp.data.repository.AuthenticationRepositoryImpl
+import com.example.storyapp.data.repository.UploadStoryRepositoryImpl
 import com.example.storyapp.databinding.ActivityAddStoriesBinding
 import com.example.storyapp.util.LoadingDialog
 import com.example.storyapp.util.reduceFileImage
@@ -82,7 +85,10 @@ class AddStoriesActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.add_stories_activity_title)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        val uploadStoryViewModel = ViewModelProvider(this)[UploadStoryViewModel::class.java]
+        val uploadStoryRepository = UploadStoryRepositoryImpl()
+        val uploadStoryViewModelFactory = UploadStoryViewModelFactory(uploadStoryRepository)
+
+        val uploadStoryViewModel = ViewModelProvider(this, uploadStoryViewModelFactory)[UploadStoryViewModel::class.java]
 
         if (!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(
@@ -104,28 +110,24 @@ class AddStoriesActivity : AppCompatActivity() {
             uploadStory()
         }
 
-        uploadStoryViewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
+        uploadStoryViewModel.response.observe(this) { response ->
+            when (response) {
+                is Result.Success -> {
+                    showLoading(false)
+                    Toast.makeText(this, "Upload Berhasil!", Toast.LENGTH_SHORT).show()
 
-
-        uploadStoryViewModel.isError.observe(this) {
-            if (!it) {
-                loadingDialog.dismissDialog()
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                startActivity(intent)
-                finish()
-            }
-        }
-
-
-
-        uploadStoryViewModel.isError.observe(this) {
-            if (it) {
-                Toast.makeText(this, "Upload gagal!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Upload Berhasil!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    startActivity(intent)
+                    finish()
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(this, "Upload gagal!", Toast.LENGTH_SHORT).show()
+                }
+                is Result.Loading -> {
+                    showLoading(true)
+                }
             }
         }
 
@@ -255,11 +257,15 @@ class AddStoriesActivity : AppCompatActivity() {
                 requestImageFile
             )
 
-            val pref = LoginPreferences.getInstance(dataStore)
-            val authenticationRepository = AuthenticationRepository()
+            val pref = LoginPreferencesImpl.getInstance(dataStore)
+            val authenticationRepository = AuthenticationRepositoryImpl()
             val loginViewModel =
                 ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
-            val uploadStoryViewModel = ViewModelProvider(this)[UploadStoryViewModel::class.java]
+
+            val uploadStoryRepository = UploadStoryRepositoryImpl()
+            val uploadStoryViewModelFactory = UploadStoryViewModelFactory(uploadStoryRepository)
+
+            val uploadStoryViewModel = ViewModelProvider(this, uploadStoryViewModelFactory)[UploadStoryViewModel::class.java]
 
             if (binding.cbLocation.isChecked) {
                 loginViewModel.getUserLoginData().observe(this) { token: String ->

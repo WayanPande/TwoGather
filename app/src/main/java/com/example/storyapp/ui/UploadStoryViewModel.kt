@@ -1,51 +1,41 @@
 package com.example.storyapp.ui
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.storyapp.data.remote.Result
 import com.example.storyapp.data.remote.response.StoryUploadResponse
-import com.example.storyapp.data.remote.retrofit.ApiConfig
+import com.example.storyapp.data.repository.UploadStoryRepository
+import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 
-class UploadStoryViewModel : ViewModel() {
+class UploadStoryViewModel(private val repository: UploadStoryRepository) : ViewModel() {
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _response = MutableLiveData<Result<StoryUploadResponse>>()
+    val response: LiveData<Result<StoryUploadResponse>> = _response
 
-    private val _isError = MutableLiveData<Boolean>()
-    val isError: LiveData<Boolean> = _isError
+    fun uploadStory(
+        token: String,
+        image: MultipartBody.Part,
+        description: RequestBody,
+        lat: Float? = null,
+        lon: Float? = null
+    ) = viewModelScope.launch {
+        _response.postValue(Result.Loading)
+        val response = repository.uploadStory(token, image, description, lat, lon)
+        _response.postValue(handleUploadResponse(response))
+    }
 
-
-    fun uploadStory(token: String, image: MultipartBody.Part, description: RequestBody, lat: Float? = null, lon: Float? = null) {
-        _isLoading.value = true
-        val client = ApiConfig.getApiService().uploadStory("Bearer $token", image, description, lat, lon)
-        client.enqueue(object : Callback<StoryUploadResponse> {
-            override fun onResponse(
-                call: Call<StoryUploadResponse>,
-                response: Response<StoryUploadResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _isError.value = false
-                    }
-                } else {
-                    _isError.value = true
-                }
-                _isLoading.value = false
+    private fun handleUploadResponse(response: Response<StoryUploadResponse>): Result<StoryUploadResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                return Result.Success(resultResponse)
             }
-
-            override fun onFailure(call: Call<StoryUploadResponse>, t: Throwable) {
-                _isLoading.value = false
-                _isError.value = true
-                Log.e("UPLOAD", "onFailure: ${t.message}")
-            }
-        })
+        }
+        return Result.Error(response.message())
     }
 
 }
