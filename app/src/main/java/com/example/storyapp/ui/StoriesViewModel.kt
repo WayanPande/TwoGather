@@ -1,58 +1,43 @@
 package com.example.storyapp.ui
 
-import android.content.Context
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.example.storyapp.data.repository.StoryRepository
+import com.example.storyapp.data.remote.Result
 import com.example.storyapp.data.remote.response.ListStoryItem
 import com.example.storyapp.data.remote.response.StoryListResponse
-import com.example.storyapp.data.remote.retrofit.ApiConfig
-import com.example.storyapp.di.Injection
+import com.example.storyapp.data.repository.StoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import retrofit2.Call
-import retrofit2.Callback
+import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class StoriesViewModel(private val storyRepository: StoryRepository) : ViewModel() {
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _isError = MutableLiveData<Boolean>()
-    val isError: LiveData<Boolean> = _isError
-
     private val _storyList = MutableLiveData<ArrayList<ListStoryItem>>()
     val storyList: LiveData<ArrayList<ListStoryItem>> = _storyList
 
+    private val _response = MutableLiveData<Result<StoryListResponse>>()
+    val response: LiveData<Result<StoryListResponse>> = _response
 
-    fun getStoriesListWithCoordinate(token: String) {
-        _isLoading.value = true
-        val client = ApiConfig.getApiService().getStoriesWithCoordinate("Bearer $token", 1)
-        client.enqueue(object : Callback<StoryListResponse> {
-            override fun onResponse(
-                call: Call<StoryListResponse>,
-                response: Response<StoryListResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        setStoryList(responseBody.listStory as List<ListStoryItem>)
-                    }
-                } else {
-                    _isError.value = true
-                }
-                _isLoading.value = false
-            }
+    fun getStoriesListWithCoordinate(token: String) = viewModelScope.launch {
+        _response.postValue(Result.Loading)
+        val response = storyRepository.getStoriesListWithCoordinate(token)
+        _response.postValue(handleStoriesWithCoordinateResponse(response))
+    }
 
-            override fun onFailure(call: Call<StoryListResponse>, t: Throwable) {
-                _isLoading.value = false
-                Log.e("STORIES", "onFailure: ${t.message}")
+    private fun handleStoriesWithCoordinateResponse(response: Response<StoryListResponse>): Result<StoryListResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                setStoryList(resultResponse.listStory as List<ListStoryItem>)
+                return Result.Success(resultResponse)
             }
-        })
+        }
+        return Result.Error(response.message())
     }
 
     private fun setStoryList(data: List<ListStoryItem>) {
@@ -80,15 +65,5 @@ class StoriesViewModel(private val storyRepository: StoryRepository) : ViewModel
                 }
             }
             .cachedIn(viewModelScope)
-    }
-}
-
-class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(StoriesViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return StoriesViewModel(Injection.provideRepository(context)) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

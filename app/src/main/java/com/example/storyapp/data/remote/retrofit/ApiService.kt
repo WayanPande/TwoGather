@@ -34,10 +34,10 @@ interface ApiService {
     ): Response<StoryListResponse>
 
     @GET("stories")
-    fun getStoriesWithCoordinate(
+    suspend fun getStoriesWithCoordinate(
         @Header("Authorization") token: String,
         @Query("location") location: Int,
-    ): Call<StoryListResponse>
+    ): Response<StoryListResponse>
 
     @Multipart
     @POST("stories")

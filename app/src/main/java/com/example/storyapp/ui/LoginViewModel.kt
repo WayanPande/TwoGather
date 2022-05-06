@@ -2,9 +2,9 @@ package com.example.storyapp.ui
 
 
 import androidx.lifecycle.*
-import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.data.remote.Result
 import com.example.storyapp.data.remote.response.LoginResponse
+import com.example.storyapp.data.repository.AuthenticationRepository
 import kotlinx.coroutines.launch
 import retrofit2.Response
 

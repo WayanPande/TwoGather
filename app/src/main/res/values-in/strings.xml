@@ -8,14 +8,12 @@
     <string name="name_hint">Nama</string>
     <string name="already_sign_up">Sudah mendaftar?</string>
     <string name="logout">Keluar</string>
-    <string name="dark_mode">Mode gelap</string>
     <string name="camera">Kamera</string>
     <string name="gallery">Galeri</string>
     <string name="description">Deskripsi</string>
     <string name="upload">Unggah</string>
     <string name="app_name">AplikasiStory</string>
     <string name="app_icon">IconAplikasi</string>
-    <string name="settings">Pengaturan</string>
     <string name="add_stories_activity_title">Postingan baru</string>
     <string name="stories_detail_activity_title">Detail story</string>
     <string name="retry">Coba lagi</string>

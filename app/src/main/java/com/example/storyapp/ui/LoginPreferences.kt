@@ -7,17 +7,23 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class LoginPreferences private constructor(private val dataStore: DataStore<Preferences>) {
+interface LoginPreferences {
+    suspend fun saveUserLoginData(data: String)
+    fun getUserLoginData(): Flow<String>
+}
+
+class LoginPreferencesImpl private constructor(private val dataStore: DataStore<Preferences>) :
+    LoginPreferences {
 
     private val TOKEN_KEY = stringPreferencesKey("token")
 
-    suspend fun saveUserLoginData(data: String) {
+    override suspend fun saveUserLoginData(data: String) {
         dataStore.edit { preference ->
             preference[TOKEN_KEY] = data
         }
     }
 
-    fun getUserLoginData(): Flow<String> {
+    override fun getUserLoginData(): Flow<String> {
         return dataStore.data.map { preference ->
             preference[TOKEN_KEY] ?: ""
         }
@@ -25,11 +31,11 @@ class LoginPreferences private constructor(private val dataStore: DataStore<Pref
 
     companion object {
         @Volatile
-        private var INSTANCE: LoginPreferences? = null
+        private var INSTANCE: LoginPreferencesImpl? = null
 
-        fun getInstance(dataStore: DataStore<Preferences>): LoginPreferences {
+        fun getInstance(dataStore: DataStore<Preferences>): LoginPreferencesImpl {
             return INSTANCE ?: synchronized(this) {
-                val instance = LoginPreferences(dataStore)
+                val instance = LoginPreferencesImpl(dataStore)
                 INSTANCE = instance
                 instance
             }

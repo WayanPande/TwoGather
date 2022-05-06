@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Code/Android/StoryApp/app/src/main/res/drawable/bottom_sheet_holder.xml" value="0.331" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/drawable/custom_input.xml" value="0.171" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/drawable/error_edt.xml" value="0.227" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/drawable/ic_baseline_error_24.xml" value="0.171" />
@@ -20,7 +21,7 @@
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/activity_splash_screen.xml" value="0.3541666666666667" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/activity_stories_detail.xml" value="0.3541666666666667" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/fragment_home.xml" value="0.17223910840932116" />
-        <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/item_bottom_sheet.xml" value="0.24166666666666667" />
+        <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/item_bottom_sheet.xml" value="0.5" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/item_loading.xml" value="0.23958333333333334" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/item_row_story.xml" value="0.3541666666666667" />
         <entry key="..\:/Code/Android/StoryApp/app/src/main/res/layout/loading_dialog.xml" value="0.3541666666666667" />

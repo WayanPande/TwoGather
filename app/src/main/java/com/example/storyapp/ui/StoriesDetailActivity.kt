@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.example.storyapp.R
-import com.example.storyapp.data.repository.AuthenticationRepository
+import com.example.storyapp.data.repository.AuthenticationRepositoryImpl
 import com.example.storyapp.databinding.ActivityStoriesDetailBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -89,8 +89,8 @@ class StoriesDetailActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menu_toggle -> {
 
-                val pref = LoginPreferences.getInstance(dataStore)
-                val authenticationRepository = AuthenticationRepository()
+                val pref = LoginPreferencesImpl.getInstance(dataStore)
+                val authenticationRepository = AuthenticationRepositoryImpl()
                 val loginViewModel =
                     ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
 

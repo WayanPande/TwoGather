@@ -10,8 +10,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.data.remote.Result
+import com.example.storyapp.data.repository.AuthenticationRepositoryImpl
 import com.example.storyapp.databinding.ActivitySignUpBinding
 import com.example.storyapp.util.LoadingDialog
 
@@ -28,7 +28,7 @@ class SignUpActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        val authenticationRepository = AuthenticationRepository()
+        val authenticationRepository = AuthenticationRepositoryImpl()
         val registerViewModelFactory = RegisterViewModelFactory(authenticationRepository)
         registerViewModel =
             ViewModelProvider(this, registerViewModelFactory)[RegisterViewModel::class.java]

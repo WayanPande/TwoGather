@@ -1,4 +1,4 @@
-package com.example.storyapp
+package com.example.storyapp.fake
 
 import com.example.storyapp.ui.LoginPreferences
 import kotlinx.coroutines.flow.Flow

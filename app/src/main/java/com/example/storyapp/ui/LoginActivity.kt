@@ -13,8 +13,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
-import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.data.remote.Result
+import com.example.storyapp.data.repository.AuthenticationRepositoryImpl
 import com.example.storyapp.databinding.ActivityLoginBinding
 import com.example.storyapp.util.LoadingDialog
 
@@ -32,8 +32,8 @@ class LoginActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        val pref = LoginPreferences.getInstance(dataStore)
-        val authenticationRepository = AuthenticationRepository()
+        val pref = LoginPreferencesImpl.getInstance(dataStore)
+        val authenticationRepository = AuthenticationRepositoryImpl()
         val loginViewModel =
             ViewModelProvider(
                 this,

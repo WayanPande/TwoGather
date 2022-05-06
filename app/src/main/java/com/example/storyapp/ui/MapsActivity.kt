@@ -7,11 +7,12 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.R
+import com.example.storyapp.data.remote.Result
+import com.example.storyapp.data.repository.StoryRepositoryImpl
 import com.example.storyapp.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,15 +26,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private val storiesViewModel: StoriesViewModel by viewModels {
-        ViewModelFactory(this)
-    }
+    private lateinit var storiesViewModel: StoriesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val storyRepository = StoryRepositoryImpl()
+        val storiesViewModelFactory = StoriesViewModelFactory(storyRepository)
+        storiesViewModel =
+            ViewModelProvider(this, storiesViewModelFactory)[StoriesViewModel::class.java]
 
         val token = intent.getStringExtra("TOKEN")
 
@@ -67,8 +71,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Add a marker in Sydney and move the camera
 
 
-        storiesViewModel.storyList.observe(this) { stories ->
+        storiesViewModel.response.observe(this) { response ->
 
+            when (response) {
+                is Result.Success -> {
+                   setStoriesOnMaps()
+                }
+                is Result.Error -> {
+
+                }
+                is Result.Loading -> {
+
+                }
+            }
+
+        }
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.7893, 113.9213), 5f))
+        getMyLocation()
+        setMapStyle()
+    }
+
+    private fun setStoriesOnMaps() {
+        storiesViewModel.storyList.observe(this) { stories ->
             for(story in stories) {
                 mMap.addMarker(
                     MarkerOptions()
@@ -78,10 +103,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             }
         }
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.7893, 113.9213), 5f))
-        getMyLocation()
-        setMapStyle()
     }
 
     private val requestPermissionLauncher =

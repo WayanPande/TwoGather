@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.data.remote.Result
 import com.example.storyapp.data.remote.response.RegisterResponse
+import com.example.storyapp.data.repository.AuthenticationRepository
 import kotlinx.coroutines.launch
 import retrofit2.Response
 

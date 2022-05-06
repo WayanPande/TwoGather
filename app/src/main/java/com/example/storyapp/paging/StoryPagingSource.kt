@@ -3,7 +3,6 @@ package com.example.storyapp.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.storyapp.data.remote.response.ListStoryItem
-import com.example.storyapp.data.remote.response.StoryListResponse
 import com.example.storyapp.data.remote.retrofit.ApiService
 
 class StoryPagingSource(private val apiService: ApiService, private val token: String) : PagingSource<Int, ListStoryItem>() {

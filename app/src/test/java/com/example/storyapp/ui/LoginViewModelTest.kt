@@ -1,12 +1,12 @@
 package com.example.storyapp.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.storyapp.FakeAuthenticationRepository
-import com.example.storyapp.FakeLoginPreference
 import com.example.storyapp.MainCoroutineRule
 import com.example.storyapp.data.remote.Result
 import com.example.storyapp.data.remote.response.LoginResponse
 import com.example.storyapp.data.remote.response.LoginResult
+import com.example.storyapp.fake.FakeAuthenticationRepository
+import com.example.storyapp.fake.FakeLoginPreference
 import com.example.storyapp.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi

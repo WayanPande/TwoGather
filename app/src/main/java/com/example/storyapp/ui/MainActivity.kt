@@ -8,20 +8,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.storyapp.R
 import com.example.storyapp.adapter.LoadingStateAdapter
 import com.example.storyapp.adapter.StoriesListAdapter
-import com.example.storyapp.data.repository.AuthenticationRepository
+import com.example.storyapp.data.repository.AuthenticationRepositoryImpl
+import com.example.storyapp.data.repository.StoryRepositoryImpl
 import com.example.storyapp.databinding.ActivityMainBinding
 import com.example.storyapp.util.LoadingDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -33,9 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val loadingDialog = LoadingDialog(this)
-    private val storiesViewModel: StoriesViewModel by viewModels {
-        ViewModelFactory(this)
-    }
+    private lateinit var storiesViewModel: StoriesViewModel
     private var adapter: StoriesListAdapter? = null
     private var token: String = ""
 
@@ -48,14 +46,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        val pref = LoginPreferences.getInstance(dataStore)
-        val authenticationRepository = AuthenticationRepository()
+        val pref = LoginPreferencesImpl.getInstance(dataStore)
+        val authenticationRepository = AuthenticationRepositoryImpl()
         val loginViewModel =
-            ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
+            ViewModelProvider(
+                this,
+                LoginViewModelFactory(pref, authenticationRepository)
+            )[LoginViewModel::class.java]
 
+
+        val storyRepository = StoryRepositoryImpl()
+        val storiesViewModelFactory = StoriesViewModelFactory(storyRepository)
+        storiesViewModel =
+            ViewModelProvider(this, storiesViewModelFactory)[StoriesViewModel::class.java]
 
         loginViewModel.getUserLoginData().observe(this) { token: String ->
-
             if (token == "") {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
@@ -65,17 +70,6 @@ class MainActivity : AppCompatActivity() {
             this.token = token
             initView()
             showRecycleList()
-        }
-
-
-        storiesViewModel.isLoading.observe(this) {
-            showLoading(it)
-        }
-
-        storiesViewModel.isError.observe(this) {
-            if (it) {
-                Toast.makeText(this, "Fail to load data!", Toast.LENGTH_LONG).show()
-            }
         }
 
         binding.floatBtn.setOnClickListener {
@@ -102,10 +96,15 @@ class MainActivity : AppCompatActivity() {
         })
 
         binding.refreshLayout.setOnRefreshListener {
-            showRecycleList()
-            adapter?.notifyDataSetChanged()
+            adapter?.refresh()
             binding.rvStory.scrollToPosition(0)
             binding.refreshLayout.isRefreshing = false
+        }
+
+        lifecycleScope.launch {
+            adapter?.loadStateFlow?.collectLatest { loadStates ->
+                showLoading(loadStates.refresh is LoadState.Loading)
+            }
         }
     }
 
@@ -121,10 +120,13 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menu_toggle -> {
 
-                val pref = LoginPreferences.getInstance(dataStore)
-                val authenticationRepository = AuthenticationRepository()
+                val pref = LoginPreferencesImpl.getInstance(dataStore)
+                val authenticationRepository = AuthenticationRepositoryImpl()
                 val loginViewModel =
-                    ViewModelProvider(this, LoginViewModelFactory(pref, authenticationRepository))[LoginViewModel::class.java]
+                    ViewModelProvider(
+                        this,
+                        LoginViewModelFactory(pref, authenticationRepository)
+                    )[LoginViewModel::class.java]
 
                 val view: View = layoutInflater.inflate(R.layout.item_bottom_sheet, null)
                 val dialog = BottomSheetDialog(this)
@@ -134,6 +136,7 @@ class MainActivity : AppCompatActivity() {
                 val logoutBtn = dialog.findViewById<TextView>(R.id.tv_logout)
 
                 logoutBtn?.setOnClickListener {
+                    dialog.dismiss()
                     loginViewModel.logoutUser()
                 }
 
@@ -143,6 +146,7 @@ class MainActivity : AppCompatActivity() {
                     val intent = Intent(this, MapsActivity::class.java)
                     intent.putExtra("TOKEN", token)
                     startActivity(intent)
+                    dialog.dismiss()
                 }
 
             }

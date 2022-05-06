@@ -24,7 +24,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.R
 import com.example.storyapp.data.remote.Result
-import com.example.storyapp.data.repository.AuthenticationRepository
 import com.example.storyapp.data.repository.AuthenticationRepositoryImpl
 import com.example.storyapp.data.repository.UploadStoryRepositoryImpl
 import com.example.storyapp.databinding.ActivityAddStoriesBinding
